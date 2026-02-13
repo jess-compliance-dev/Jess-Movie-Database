@@ -31,10 +31,11 @@ Project is created with:
 * Filter movies by minimum rating, start year, and end year
 * Sort movies by rating
 * Color-coded console output for readability
+* Generating a website of database
 
 ## Project Purpose
 This project is designed as a learning tool for Python developers to practice:
-- CRUD operations (Create, Read, Update, Delete)
+- CRD operations (Create, Read, Delete)
 - Handling local data storage
 - Working with console-based user interfaces
 - Implementing menu-driven programs
@@ -47,7 +48,7 @@ Clone the repository and ensure Python is installed:
 
 ```bash
 $ git clone https://github.com/yourusername/movie-database.git
-$ cd movie-database
+$ cd my-movie-database
 ````
 
 Check Python version:
@@ -55,6 +56,16 @@ Check Python version:
 $ python --version
 Python 3.14
 ````
+
+Intall dependencies
+```bash
+pip install sqlalchemy requests python-dotenv
+```
+
+Create a .env file in the project root and add your OMDb API key
+```bash
+OMDB_API_KEY=your_api_key_here
+```
 
 Run the program:
 ```bash
@@ -65,13 +76,13 @@ Choose an option from the menu:
 1 – List movies
 2 – Add movie
 3 – Delete movie
-4 – Update movie
-5 – Statistics
-6 – Random movie
-7 – Search movie
-8 – Movies sorted by rating
-9 – Filter movies
-Follow the prompts. Leave fields blank if optional.
+4 – Statistics
+5 – Random movie
+6 – Search movie
+7 – Movies sorted by rating
+8 – Filter movies
+9 – Generating website
+
 
 Example: Adding a movie
 
