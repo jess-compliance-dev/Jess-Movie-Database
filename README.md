@@ -11,18 +11,21 @@
 
 
 ## General info
-🎥 Movie Database is a Python-based console application that allows users to browse, manage, and view detailed information about movies stored in a local database.  All data is managed internally, without relying on external APIs, making it ideal for learning CRUD operations, state management, and database handling.
+🎥 A Python application for managing and displaying a personal movie database. You can add, delete, search, and sort movies by rating. The program connects to the OMDb API (movie database) and can also generate a simple website showcasing all movies.
 
 ## Technologies
 Project is created with:
 * Python version: 3.14
-* Standard Python libraries: `random`, `os`
-* Local JSON-based storage (`movie_storage.py`) for persistent data management
+*[SQLite](https://www.sqlite.org/) (built into Python)
+- Python packages:
+  - `sqlalchemy`
+  - `requests`
+  - `python-dotenv`
 
 ## Features
 * List all movies with detailed info (title, rating, year, director, actors)
-* Add, delete, and update movies
-* Search movies by title keyword
+* Add and delete, 
+* Search movies 
 * View statistics: average, median, highest, lowest ratings, best/worst movies
 * Get a random movie recommendation
 * Filter movies by minimum rating, start year, and end year
