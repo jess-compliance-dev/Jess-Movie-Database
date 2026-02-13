@@ -35,13 +35,12 @@ Project is created with:
 
 ## Project Purpose
 This project is designed as a learning tool for Python developers to practice:
-- CRD operations (Create, Read, Delete)
-- Handling local data storage
-- Working with console-based user interfaces
-- Implementing menu-driven programs
-- Managing program state and data validation
-- Practicing modular Python coding and clean structure
-
+* Handling local data storage with SQLite  
+* Working with console-based user interfaces and menu-driven programs  
+* Fetching and processing data from external APIs (OMDb API)  
+* Generating dynamic HTML content for a simple website  
+* Managing program state, data validation, and error handling  
+* Practicing modular Python coding and clean, maintainable structure
 
 ## Setup
 Clone the repository and ensure Python is installed:
