@@ -17,7 +17,9 @@
 Project is created with:
 * Python version: 3.14
 *[SQLite](https://www.sqlite.org/) (built into Python)
-- Python packages:
+*[OMDb API](http://www.omdbapi.com/) for fetching movie data  
+* HTML for generating a simple website of all movies 
+* Python packages:
   - `sqlalchemy`
   - `requests`
   - `python-dotenv`
