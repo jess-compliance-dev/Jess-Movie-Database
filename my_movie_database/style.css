@@ -1,0 +1,92 @@
+/* Grundlayout  */
+body {
+    background: #f0f2f5;
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Seiten-Titel */
+.list-movies-title {
+    padding: 20px 0;
+    background: #1ABC9C;
+    color: white;
+    text-align: center;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+/* Movie Grid  */
+.movie-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 30px;
+    padding: 30px;
+    list-style-type: none;
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+/* Film-Karten  */
+.movie-grid li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.movie-grid li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+/* Poster */
+.movie-poster {
+    width: 160px;
+    height: 240px;
+    object-fit: cover;
+    border-bottom: 1px solid #eee;
+}
+
+/* Info  */
+.movie-info {
+    padding: 10px 5px 15px 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.movie-title {
+    font-weight: 600;
+    font-size: 1em;
+    text-align: center;
+    color: #222;
+}
+
+.movie-year {
+    font-size: 0.85em;
+    color: #777;
+    text-align: center;
+}
+
+/*  Responsiveness  */
+@media (max-width: 600px) {
+    .movie-grid {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .movie-poster {
+        width: 120px;
+        height: 180px;
+    }
+}
