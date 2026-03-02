@@ -1,31 +1,13 @@
 import os
 import random
-from sqlalchemy import create_engine, text
 import requests
 from dotenv import load_dotenv
+import movie_storage_sql as storage
 
-# Loading API key
 load_dotenv()
 OMDB_API_KEY = os.getenv("OMDB_API_KEY")
 if not OMDB_API_KEY:
     raise ValueError("OMDb API Key not set yet!")
-
-# Database setup
-DB_FILE = os.path.join(os.path.dirname(__file__), "movies.db")
-DB_URL = f"sqlite:///{DB_FILE}"
-engine = create_engine(DB_URL, echo=False)
-
-with engine.connect() as connection:
-    connection.execute(text(
-        "CREATE TABLE IF NOT EXISTS movies ("
-        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-        "title TEXT UNIQUE NOT NULL, "
-        "year INTEGER, "
-        "rating REAL, "
-        "director TEXT, "
-        "actors TEXT, "
-        "poster_url TEXT)"))
-    connection.commit()
 
 
 class Colors:
@@ -37,49 +19,28 @@ class Colors:
 
 
 def press_enter_to_continue():
-    """Pause before returning to menu."""
     input(f"{Colors.BLUE}Press Enter to return to menu...{Colors.RESET}")
 
 
 def print_title():
-    """Print program title."""
     print(Colors.BLUE + Colors.LIGHT_BLUE + "Jessy's Movies Database" + Colors.RESET)
 
 
 def get_movies():
-    """Return all movies from database as list of dicts."""
-    with engine.connect() as connection:
-        result = connection.execute(text(
-            "SELECT title, year, rating, director, actors, poster_url FROM movies"))
-        rows = result.fetchall()
-
-    movies = []
-    for row in rows:
-        actors_list = row[4].split(",") if row[4] else []
-        movies.append({
-            "title": row[0],
-            "year": row[1],
-            "rating": row[2],
-            "director": row[3],
-            "actors": actors_list,
-            "poster_url": row[5]})
-    return movies
+    return storage.get_movies()
 
 
 def add_movie():
-    """Add movie by title using OMDb API."""
     title_input = input("Enter movie title: ").strip()
     if not title_input:
         print(f"{Colors.RED}Title cannot be empty!{Colors.RESET}")
         return
 
-    # Check if movie exists
     for movie in get_movies():
         if movie['title'].lower() == title_input.lower():
             print(f"{Colors.RED}Movie already exists!{Colors.RESET}")
             return
 
-    # Fetch from OMDb
     url = f"http://www.omdbapi.com/?t={title_input}&apikey={OMDB_API_KEY}"
     response = requests.get(url)
     if response.status_code != 200:
@@ -91,60 +52,44 @@ def add_movie():
         print(f"{Colors.RED}Movie not found in OMDb.{Colors.RESET}")
         return
 
-    # Extract data
     title = data.get("Title", title_input)
 
     year_str = data.get("Year", "")
-    if year_str.isdigit():
-        year = int(year_str)
-    else:
-        year = None
+    year = int(year_str) if year_str.isdigit() else None
 
     imdb_rating = data.get("imdbRating", "")
-    if imdb_rating != "N/A" and imdb_rating != "":
-        rating = float(imdb_rating)
-    else:
-        rating = None
+    rating = float(imdb_rating) if imdb_rating not in ("N/A", "") else None
 
     director = data.get("Director", "Unknown")
-    actors = data.get("Actors", "Unknown")
+    actors = data.get("Actors", "Unknown").split(", ")
     poster_url = data.get("Poster", "")
 
-    with engine.connect() as connection:
-        try:
-            connection.execute(text(
-                "INSERT INTO movies (title, year, rating, director, actors, poster_url) "
-                "VALUES (:title, :year, :rating, :director, :actors, :poster_url)"),
-                {"title": title, "year": year, "rating": rating,
-                 "director": director, "actors": actors, "poster_url": poster_url})
-            connection.commit()
-            print(f"{Colors.YELLOW}Movie added successfully!{Colors.RESET}")
-        except Exception as e:
-            print(f"{Colors.RED}Error: {e}{Colors.RESET}")
+    try:
+        storage.add_movie(title, year, rating, director, actors, poster_url)
+        print(f"{Colors.YELLOW}Movie added successfully!{Colors.RESET}")
+    except Exception as e:
+        print(f"{Colors.RED}Error: {e}{Colors.RESET}")
+
     press_enter_to_continue()
 
 
 def delete_movie():
-    """Delete a movie by title."""
     title_input = input("Enter title to delete: ").strip()
     if not title_input:
         print(f"{Colors.RED}Title cannot be empty!{Colors.RESET}")
         return
 
-    with engine.connect() as connection:
-        result = connection.execute(text(
-            "DELETE FROM movies WHERE title = :title"), {"title": title_input})
-        connection.commit()
+    deleted = storage.delete_movie(title_input)
 
-    if result.rowcount == 0:
+    if deleted == 0:
         print(f"{Colors.RED}Movie not found!{Colors.RESET}")
     else:
         print(f"{Colors.YELLOW}Movie deleted successfully.{Colors.RESET}")
+
     press_enter_to_continue()
 
 
 def calculate_median(numbers):
-    """Return median of a list of numbers."""
     numbers_sorted = sorted(numbers)
     n = len(numbers_sorted)
     mid = n // 2
@@ -155,7 +100,6 @@ def calculate_median(numbers):
 
 
 def stats():
-    """Print statistics about movie ratings."""
     movies = get_movies()
     ratings = [float(m['rating']) for m in movies if m['rating'] not in [None, "Unknown"]]
 
@@ -180,7 +124,6 @@ def stats():
 
 
 def random_movie():
-    """Pick a random movie to suggest."""
     movies = get_movies()
     if not movies:
         print("No movies available.")
@@ -192,7 +135,6 @@ def random_movie():
 
 
 def search_movie():
-    """Search movies by title keyword."""
     query = input("Enter keyword to search: ").lower()
     movies = get_movies()
     found = False
@@ -206,20 +148,13 @@ def search_movie():
 
 
 def sort_by_rating():
-    """Sort movies by rating descending without using lambda."""
     movies = get_movies()
 
-    movies_sorted = movies[:]
-
-    n = len(movies_sorted)
-    for i in range(n):
-        for j in range(0, n - i - 1):
-            rating_j = movies_sorted[j]['rating'] if movies_sorted[j]['rating'] not in [None, "Unknown"] else -1
-            rating_j1 = movies_sorted[j + 1]['rating'] if movies_sorted[j + 1]['rating'] not in [None,
-                                                                                                 "Unknown"] else -1
-            if rating_j < rating_j1:
-                # Swap
-                movies_sorted[j], movies_sorted[j + 1] = movies_sorted[j + 1], movies_sorted[j]
+    movies_sorted = sorted(
+        movies,
+        key=lambda m: m['rating'] or -1,
+        reverse=True
+    )
 
     for m in movies_sorted:
         print(f"{m['title']}: {m['rating']}")
@@ -228,7 +163,6 @@ def sort_by_rating():
 
 
 def filter_movies():
-    """Filter movies by rating and year."""
     min_rating = input("Minimum rating (leave blank for no filter): ").strip()
     start_year = input("Start year (leave blank for no filter): ").strip()
     end_year = input("End year (leave blank for no filter): ").strip()
@@ -264,11 +198,16 @@ def filter_movies():
 
 
 def generate_website():
-    """Generate a website using the HTML template and movie data."""
     movies = get_movies()
 
+    template_path = os.path.join(
+        os.path.dirname(__file__),
+        "_static",
+        "index_template.html"
+    )
+
     try:
-        with open("index_template.html", "r") as f:
+        with open(template_path, "r", encoding="utf-8") as f:
             template = f.read()
     except FileNotFoundError:
         print(f"{Colors.RED}Template file not found in _static/index_template.html{Colors.RESET}")
@@ -288,7 +227,9 @@ def generate_website():
     template = template.replace("__TEMPLATE_TITLE__", "Jess' Movie Collection")
     template = template.replace("__TEMPLATE_MOVIE_GRID__", movie_grid_html)
 
-    with open("index.html", "w", encoding="utf-8") as f:
+    output_path = os.path.join(os.path.dirname(__file__), "index.html")
+
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(template)
 
     print(f"{Colors.YELLOW}Website was generated successfully.{Colors.RESET}")

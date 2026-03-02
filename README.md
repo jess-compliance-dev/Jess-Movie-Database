@@ -11,40 +11,45 @@
 
 
 ## General info
-🎥 Movie Database is a Python-based console application that allows users to browse, manage, and view detailed information about movies stored in a local database.  All data is managed internally, without relying on external APIs, making it ideal for learning CRUD operations, state management, and database handling.
+🎥 A Python application for managing and displaying a personal movie database. You can add, delete, search, and sort movies by rating. The program connects to the OMDb API (movie database) and can also generate a simple website showcasing all movies.
 
 ## Technologies
 Project is created with:
 * Python version: 3.14
-* Standard Python libraries: `random`, `os`
-* Local JSON-based storage (`movie_storage.py`) for persistent data management
+*[SQLite](https://www.sqlite.org/) (built into Python)
+*[OMDb API](http://www.omdbapi.com/) for fetching movie data  
+* HTML for generating a simple website of all movies 
+* Python packages:
+  - `sqlalchemy`
+  - `requests`
+  - `python-dotenv`
 
 ## Features
 * List all movies with detailed info (title, rating, year, director, actors)
-* Add, delete, and update movies
-* Search movies by title keyword
+* Add and delete, 
+* Search movies 
 * View statistics: average, median, highest, lowest ratings, best/worst movies
 * Get a random movie recommendation
 * Filter movies by minimum rating, start year, and end year
 * Sort movies by rating
 * Color-coded console output for readability
+* Generating a website of database
 
 ## Project Purpose
 This project is designed as a learning tool for Python developers to practice:
-- CRUD operations (Create, Read, Update, Delete)
-- Handling local data storage
-- Working with console-based user interfaces
-- Implementing menu-driven programs
-- Managing program state and data validation
-- Practicing modular Python coding and clean structure
-
+* Handling local data storage with SQLite  
+* Working with console-based user interfaces and menu-driven programs  
+* Fetching and processing data from external APIs (OMDb API)  
+* Generating dynamic HTML content for a simple website  
+* Managing program state, data validation, and error handling  
+* Practicing modular Python coding and clean, maintainable structure
 
 ## Setup
 Clone the repository and ensure Python is installed:
 
 ```bash
 $ git clone https://github.com/yourusername/movie-database.git
-$ cd movie-database
+$ cd my-movie-database
 ````
 
 Check Python version:
@@ -52,6 +57,16 @@ Check Python version:
 $ python --version
 Python 3.14
 ````
+
+Intall dependencies
+```bash
+pip install sqlalchemy requests python-dotenv
+```
+
+Create a .env file in the project root and add your OMDb API key
+```bash
+OMDB_API_KEY=your_api_key_here
+```
 
 Run the program:
 ```bash
@@ -62,13 +77,13 @@ Choose an option from the menu:
 1 – List movies
 2 – Add movie
 3 – Delete movie
-4 – Update movie
-5 – Statistics
-6 – Random movie
-7 – Search movie
-8 – Movies sorted by rating
-9 – Filter movies
-Follow the prompts. Leave fields blank if optional.
+4 – Statistics
+5 – Random movie
+6 – Search movie
+7 – Movies sorted by rating
+8 – Filter movies
+9 – Generating website
+
 
 Example: Adding a movie
 

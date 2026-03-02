@@ -1,6 +1,8 @@
 from sqlalchemy import create_engine, text
+import os
 
-DB_URL = "sqlite:///movies.db"
+DB_FILE = os.path.join(os.path.dirname(__file__), "movies.db")
+DB_URL = f"sqlite:///{DB_FILE}"
 engine = create_engine(DB_URL, echo=False)
 
 with engine.connect() as connection:
@@ -12,17 +14,16 @@ with engine.connect() as connection:
         "rating REAL, "
         "director TEXT, "
         "actors TEXT, "
-        "poster_url TEXT)"))
+        "poster_url TEXT)"
+    ))
     connection.commit()
 
 
 def get_movies():
-    """
-    Retrieve all movies from the database.
-    """
     with engine.connect() as connection:
-        result = connection.execute(
-            text("SELECT title, year, rating, director, actors FROM movies"))
+        result = connection.execute(text(
+            "SELECT title, year, rating, director, actors, poster_url FROM movies"
+        ))
         rows = result.fetchall()
 
     movies = []
@@ -33,40 +34,36 @@ def get_movies():
             "year": row[1],
             "rating": row[2],
             "director": row[3],
-            "actors": actors_list})
+            "actors": actors_list,
+            "poster_url": row[5]
+        })
     return movies
 
 
-def add_movies(title, year, rating, director, actors):
-    """
-    Add a new movie to the database.
-    """
-    actors_str = ",".join(actors)
+def add_movie(title, year, rating, director, actors, poster_url):
+    actors_str = ",".join(actors) if actors else ""
+
     with engine.connect() as connection:
-        try:
-            connection.execute(
-                text(
-                    "INSERT INTO movies (title, year, rating, director, actors) "
-                    "VALUES (:title, :year, :rating, :director, :actors)"),
-                {
-                    "title": title,
-                    "year": year,
-                    "rating": rating,
-                    "director": director,
-                    "actors": actors_str})
-            connection.commit()
-            print(f"Movie '{title}' added successfully.")
-        except Exception as e:
-            print(f"Error: {e}")
+        connection.execute(text(
+            "INSERT INTO movies (title, year, rating, director, actors, poster_url) "
+            "VALUES (:title, :year, :rating, :director, :actors, :poster_url)"
+        ), {
+            "title": title,
+            "year": year,
+            "rating": rating,
+            "director": director,
+            "actors": actors_str,
+            "poster_url": poster_url
+        })
+        connection.commit()
 
 
-def delete_movies(title):
-    """
-    Delete a movie from the database by its title.
-    """
+def delete_movie(title):
     with engine.connect() as connection:
         result = connection.execute(
             text("DELETE FROM movies WHERE title = :title"),
-            {"title": title})
+            {"title": title}
+        )
         connection.commit()
-        return result.rowcount
+
+    return result.rowcount
